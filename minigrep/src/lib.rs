@@ -27,3 +27,28 @@ pub fn run(config: Config) -> Result<(), Box<dyn Error>> {
 
     Ok(())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn new_valid_config() {
+        assert!(
+            Config::new(&vec![
+                String::from("minigrep"),
+                String::from("foo"),
+                String::from("bar")
+            ]).is_ok(),
+            "config is not okay"
+        );
+    }
+
+    #[test]
+    fn new_invalid_config() {
+        assert!(
+            Config::new(&vec![String::from("minigrep"), String::from("foo")]).is_err(),
+            "config is not invalid"
+        );
+    }
+}
