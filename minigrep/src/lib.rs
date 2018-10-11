@@ -39,13 +39,14 @@ mod tests {
             String::from("minigrep"),
             String::from("foo"),
             String::from("bar"),
-        ]).unwrap();
+        ]).expect("config should be valid");
     }
 
     #[test]
     #[should_panic(expected = "not enough arguments")]
     fn new_invalid_config() {
-        Config::new(&vec![String::from("minigrep"), String::from("foo")]).unwrap();
+        Config::new(&vec![String::from("minigrep"), String::from("foo")])
+            .expect("should panic, not enough args");
     }
 
     #[test]
@@ -56,7 +57,7 @@ mod tests {
             String::from("the"),
             String::from("nope"),
         ]).unwrap();
-        run(config).unwrap();
+        run(config).expect("file was found when it shouldn't be");
     }
 
     #[test]
@@ -66,6 +67,6 @@ mod tests {
             String::from("the"),
             String::from("poem.txt"),
         ]).unwrap();
-        run(config).unwrap()
+        run(config).expect("couldn't run with config")
     }
 }
