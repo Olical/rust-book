@@ -2,6 +2,7 @@ use std::error::Error;
 use std::fs;
 use std::io::prelude::*;
 
+#[derive(Debug, PartialEq)]
 pub struct Config {
     pub query: String,
     pub filename: String,
@@ -34,28 +35,28 @@ mod tests {
 
     #[test]
     fn new_valid_config() {
-        let config = Config::new(&vec![
+        Config::new(&vec![
             String::from("minigrep"),
             String::from("foo"),
             String::from("bar"),
-        ]);
-        assert!(config.is_ok(), "config is not okay");
+        ]).unwrap();
     }
 
     #[test]
+    #[should_panic(expected = "not enough arguments")]
     fn new_invalid_config() {
-        let config = Config::new(&vec![String::from("minigrep"), String::from("foo")]);
-        assert!(config.is_err(), "config is not invalid");
+        Config::new(&vec![String::from("minigrep"), String::from("foo")]).unwrap();
     }
 
     #[test]
+    #[should_panic(expected = "No such file or directory")]
     fn run_no_file() {
         let config = Config::new(&vec![
             String::from("minigrep"),
             String::from("the"),
             String::from("nope"),
         ]).unwrap();
-        assert!(run(config).is_err(), "the filename doesn't exist");
+        run(config).unwrap();
     }
 
     #[test]
@@ -65,6 +66,6 @@ mod tests {
             String::from("the"),
             String::from("poem.txt"),
         ]).unwrap();
-        assert!(run(config).is_ok(), "it ran file");
+        run(config).unwrap()
     }
 }
