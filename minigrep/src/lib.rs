@@ -34,21 +34,33 @@ mod tests {
 
     #[test]
     fn new_valid_config() {
-        assert!(
-            Config::new(&vec![
-                String::from("minigrep"),
-                String::from("foo"),
-                String::from("bar")
-            ]).is_ok(),
-            "config is not okay"
-        );
+        let config = Config::new(&vec![String::from("minigrep"),
+                                       String::from("foo"),
+                                       String::from("bar")]);
+        assert!(config.is_ok(), "config is not okay");
     }
 
     #[test]
     fn new_invalid_config() {
-        assert!(
-            Config::new(&vec![String::from("minigrep"), String::from("foo")]).is_err(),
-            "config is not invalid"
-        );
+        let config = Config::new(&vec![String::from("minigrep"), String::from("foo")]);
+        assert!(config.is_err(), "config is not invalid");
+    }
+
+    #[test]
+    fn run_no_file() {
+        let config = Config::new(&vec![String::from("minigrep"),
+                                       String::from("the"),
+                                       String::from("nope")])
+                .unwrap();
+        assert!(run(config).is_err(), "the filename doesn't exist");
+    }
+
+    #[test]
+    fn run_ok_when_file_exists() {
+        let config = Config::new(&vec![String::from("minigrep"),
+                                       String::from("the"),
+                                       String::from("poem.txt")])
+                .unwrap();
+        assert!(run(config).is_ok(), "it ran file");
     }
 }
