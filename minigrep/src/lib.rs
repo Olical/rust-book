@@ -9,16 +9,14 @@ pub struct Config {
 }
 
 impl Config {
-    pub fn new(mut args: env::Args) -> Result<Config, &'static str> {
-        args.next();
-
+    pub fn new(mut args: std::slice::Iter<String>) -> Result<Config, &'static str> {
         let query = match args.next() {
-            Some(arg) => arg,
+            Some(arg) => arg.clone(),
             None => return Err("Didn't get a query string"),
         };
 
         let filename = match args.next() {
-            Some(arg) => arg,
+            Some(arg) => arg.clone(),
             None => return Err("Didn't get a file name"),
         };
 
@@ -70,38 +68,33 @@ mod tests {
 
     #[test]
     fn new_valid_config() {
-        Config::new(vec![
-            String::from("minigrep"),
-            String::from("foo"),
-            String::from("bar"),
-        ]).expect("config should be valid");
+        Config::new(vec![String::from("foo"), String::from("bar")].iter())
+            .expect("config should be valid");
     }
 
     #[test]
-    #[should_panic(expected = "not enough arguments")]
-    fn new_invalid_config() {
-        Config::new(&vec![String::from("minigrep"), String::from("foo")])
-            .expect("should panic, not enough args");
+    #[should_panic(expected = "Didn\\'t get a query string")]
+    fn config_missing_query() {
+        Config::new(vec![].iter()).unwrap();
+    }
+
+    #[test]
+    #[should_panic(expected = "Didn\\'t get a file name")]
+    fn config_missing_filename() {
+        Config::new(vec![String::from("x")].iter()).unwrap();
     }
 
     #[test]
     #[should_panic(expected = "No such file or directory")]
     fn run_no_file() {
-        let config = Config::new(&vec![
-            String::from("minigrep"),
-            String::from("the"),
-            String::from("nope"),
-        ]).unwrap();
+        let config = Config::new(vec![String::from("the"), String::from("nope")].iter()).unwrap();
         run(config).expect("file was found when it shouldn't be");
     }
 
     #[test]
     fn run_ok_when_file_exists() {
-        let config = Config::new(&vec![
-            String::from("minigrep"),
-            String::from("the"),
-            String::from("poem.txt"),
-        ]).unwrap();
+        let config =
+            Config::new(vec![String::from("the"), String::from("poem.txt")].iter()).unwrap();
         run(config).expect("couldn't run with config")
     }
 
