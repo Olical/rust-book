@@ -9,13 +9,13 @@ pub struct Config {
 }
 
 impl Config {
-    pub fn new(mut args: std::slice::Iter<String>) -> Result<Config, &'static str> {
-        let query = match args.next() {
+    pub fn new(args: &[String]) -> Result<Config, &'static str> {
+        let query = match args.get(0) {
             Some(arg) => arg.clone(),
             None => return Err("Didn't get a query string"),
         };
 
-        let filename = match args.next() {
+        let filename = match args.get(1) {
             Some(arg) => arg.clone(),
             None => return Err("Didn't get a file name"),
         };
@@ -68,33 +68,32 @@ mod tests {
 
     #[test]
     fn new_valid_config() {
-        Config::new(vec![String::from("foo"), String::from("bar")].iter())
+        Config::new(&vec![String::from("foo"), String::from("bar")])
             .expect("config should be valid");
     }
 
     #[test]
     #[should_panic(expected = "Didn\\'t get a query string")]
     fn config_missing_query() {
-        Config::new(vec![].iter()).unwrap();
+        Config::new(&vec![]).unwrap();
     }
 
     #[test]
     #[should_panic(expected = "Didn\\'t get a file name")]
     fn config_missing_filename() {
-        Config::new(vec![String::from("x")].iter()).unwrap();
+        Config::new(&vec![String::from("x")]).unwrap();
     }
 
     #[test]
     #[should_panic(expected = "No such file or directory")]
     fn run_no_file() {
-        let config = Config::new(vec![String::from("the"), String::from("nope")].iter()).unwrap();
+        let config = Config::new(&vec![String::from("the"), String::from("nope")]).unwrap();
         run(config).expect("file was found when it shouldn't be");
     }
 
     #[test]
     fn run_ok_when_file_exists() {
-        let config =
-            Config::new(vec![String::from("the"), String::from("poem.txt")].iter()).unwrap();
+        let config = Config::new(&vec![String::from("the"), String::from("poem.txt")]).unwrap();
         run(config).expect("couldn't run with config")
     }
 
